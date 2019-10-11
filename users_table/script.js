@@ -1,3 +1,14 @@
+/**
+ * For the needs of the task I assume that users list is always non-empty
+ * and every object in the users list has at least 5 keys (id, name, surname, age, retired)
+ * with given values.
+ */
+
+
+/**
+ * Given users list.
+ */
+
 let users = [
     {
         id: 1,
@@ -36,28 +47,34 @@ let users = [
     },
    
 ];
- 
+
+
 /**
- * For the needs of the task I assume that users list is always non-empty
- * and every object in the users list has at least 5 keys (id, name, surname, age, retired)
- * with given values.
+ * Global variables declarations.
  */
  
 const keys = Object.keys(users[0]);
+const EmptyFieldException = {};
+const NaNException = {};
+
 let table = document.getElementsByTagName("table")[0];
 let form = document.getElementsByTagName("form")[0];
 let saveBtn = document.getElementsByClassName("save-btn")[0];
 let trs = [];
+let formInputs = [];
 let headersPlaced = false;
 let selectedID = -1;
-let EmptyFieldException = {};
-let NaNException = {};
- 
+
+
+ /**
+ * Dynamic creating html table.
+ */
+
 function createCell(tr, cellValue) {
     let element = headersPlaced ? document.createElement("td") : document.createElement("th");
  
     if (typeof(cellValue) === "boolean") {
-        cellValue = cellValue === true ? "Yes" : "No";
+        cellValue = cellValue ? "Yes" : "No";
     } else {
         cellValue = String(cellValue);
     }
@@ -76,10 +93,6 @@ function createRow(cellValues) {
     table.appendChild(tr);
 }
  
-/**
- * Dynamic creating html table.
- */
- 
 function createTable() {
     createRow(keys);
     headersPlaced = true;
@@ -88,6 +101,11 @@ function createTable() {
         createRow(Object.values(user));
     });    
 }
+
+
+/**
+ * Dynamic generating html form.
+ */
  
 function generateLabel(name) {
     let label = document.createElement("label");
@@ -112,9 +130,6 @@ function generateInput(name) {
     form.appendChild(input);
 }
  
-/**
- * Dynamic generating html form.
- */
  
 function generateForm() {
     const fieldsNames = keys.slice(1);
@@ -123,13 +138,13 @@ function generateForm() {
         generateLabel(name);
         generateInput(name);
     });
- 
-    fieldsNames.filter(name => document.getElementById(name)
-        .getAttribute("type") === "text")
+
+    /**
+     * Jumping to next form fields by clicking enter.
+     */
+    fieldsNames.filter(name => document.getElementById(name).getAttribute("type") === "text")
         .forEach((name, index, arr) => {
-            let inputElement = document.getElementById(name);
- 
-            inputElement.addEventListener("keyup", () => {
+            document.getElementById(name).addEventListener("keyup", () => {
                 if (event.keyCode === 13) {
                     if (index < arr.length-1) {
                         document.getElementById(arr[index+1]).focus();
@@ -141,6 +156,7 @@ function generateForm() {
             });
     });
 }
+
  
 /**
  * Updating html table and users list by adding EventListener to save button.
@@ -152,38 +168,57 @@ saveBtn.addEventListener("click", () => {
         let tdsToEdit = trs[selectedID].childNodes;
  
         try {
-            keys.slice(1).forEach((key, index) => {
-                let inputElement = document.getElementById(key);
-                let inputElementType= inputElement.getAttribute("type");
-               
-                if (inputElementType === "text") {
-                    if (inputElement.value === "") {
+            let inputType,
+                prop,
+                inputValue;
+
+            /**
+             * Checking if form is correctly filled.
+             */
+            formInputs.forEach((input, index) => {
+                inputType = input.getAttribute("type");
+                prop = input.getAttribute("id");
+                inputValue = input.value;
+                
+                if (inputType === "text") {
+                    if (inputValue === "") {
+                        input.focus();
                         throw EmptyFieldException;
                     }
- 
-                    let inputElementValue = inputElement.value;
-                    if (typeof(users[0][key]) === "number") {
-                        if (isNaN(parseInt(inputElementValue))) {
+    
+                    if (typeof(users[0][prop]) === "number") {
+                        if (isNaN(parseInt(inputValue))){
+                            input.focus();
                             throw NaNException;
                         }
- 
-                        userToEdit[key] = parseInt(inputElementValue);
-                    } else {
-                        userToEdit[key] = inputElementValue;
+                        type = "number";
                     }
- 
-                    tdsToEdit[++index].innerHTML = inputElement.value;
-                } else {
-                    userToEdit[key] = inputElement.checked;
-                    tdsToEdit[++index].innerHTML = inputElement.checked ? "Yes" : "No";
+                    type = "string";
                 }
- 
-                trs[selectedID].classList.remove("selected");
             });
- 
-            keys.slice(1).forEach(key => {
-                let inputElement = document.getElementById(key);
-                inputElement.getAttribute("type") === "text" ? inputElement.value = "" : inputElement.checked = false;
+    
+            trs[selectedID].classList.remove("selected");
+
+            /**
+             * Updating users list and html table.
+             */
+            formInputs.forEach((input, index) => {
+                inputType = input.getAttribute("type");
+                prop = input.getAttribute("id");
+                inputValue = input.value;
+                
+                if (inputType === "text") {
+                    if (typeof(users[0][prop]) === "number") {
+                        userToEdit[prop] = parseInt(inputValue);
+                    } else {
+                        userToEdit[prop] = inputValue;
+                    }
+                    tdsToEdit[++index].innerHTML = inputValue;
+                } else {
+                    userToEdit[prop] = input.checked;
+                    tdsToEdit[++index].innerHTML = input.checked ? "Yes" : "No";
+                }
+                input.value = "";
             });
         } catch(e) {
             if (e === EmptyFieldException) {
@@ -199,6 +234,7 @@ saveBtn.addEventListener("click", () => {
     }
 });
  
+
 /**
  * IIFE which create initial html view and add EventListener processing data from html table to form.
  */
@@ -208,6 +244,8 @@ saveBtn.addEventListener("click", () => {
     generateForm();
  
     trs = [...document.getElementsByTagName("tr")].slice(1);
+    formInputs = [...document.getElementsByTagName("form")[0].childNodes].filter((node, index) => index%2 == 1);
+
     trs.forEach((tr, index) => {
         const tds = tr.childNodes;
         let trClassList = tr.classList;
@@ -218,21 +256,17 @@ saveBtn.addEventListener("click", () => {
             }
            
             if (trClassList.contains("selected")) {
-                keys.slice(1).forEach(key => {
-                    let inputElement = document.getElementById(key);
-                    inputElement.getAttribute("type") === "text" ? inputElement.value = "" : inputElement.checked = false;
+                formInputs.forEach(input => {
+                    input.getAttribute("type") === "text" ? input.value = "" : input.checked = false;
                 });
- 
                 trClassList.remove("selected")
             } else {
                 selectedID = index;
-                keys.slice(1).forEach((key, index) => {
-                    let inputElement = document.getElementById(key);
- 
-                    if (inputElement.getAttribute("type") === "text") {
-                        inputElement.value = tds[++index].innerHTML;
+                formInputs.forEach((input, index) => {
+                    if (input.getAttribute("type") === "text") {
+                        input.value = tds[++index].innerHTML;
                     } else {
-                        inputElement.checked = tds[++index].innerHTML === "Yes" ? true : false;
+                        input.checked = tds[++index].innerHTML === "Yes" ? true : false;
                     }
                 });
  
