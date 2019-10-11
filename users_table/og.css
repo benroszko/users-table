@@ -19,6 +19,7 @@ div {
 
 .headline {
   border-bottom: 2px solid white;
+  text-shadow: 2px 2px black;
 }
  
 table, th, td {
@@ -29,6 +30,10 @@ table, th, td {
 table {
   width: 100%;
   margin-bottom: 50px;
+}
+
+th {
+    text-shadow: 2px 2px black;
 }
  
 th, td {
