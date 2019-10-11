@@ -1,0 +1,132 @@
+html {
+    height: 100%;
+}
+
+body {
+  height: 100%;
+  padding: 0px 30px;
+  color: white;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  background-image: linear-gradient(navy, aqua);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+div {
+    min-height: 100%;
+    position: relative;
+
+    .headline {
+        border-bottom: 2px solid white;
+        text-shadow: 2px 2px black;
+    }
+       
+    table, th, td {
+        border: 1px solid lightgrey;
+        border-collapse: collapse;
+    }
+       
+    table {
+        width: 100%;
+        margin-bottom: 50px;
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            text-shadow: 2px 2px black;
+        }
+
+        tr:hover:not(:first-child) {
+            background-color: skyblue;
+        }
+         
+        .selected {
+            color: black;
+            background-color: lavender;
+        }
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px;
+
+        label {
+            margin-bottom: 5px;
+        }
+         
+        .form-input {
+            background-color: white;
+            border: 2px solid lightgrey;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+         
+        .form-text {
+            height: 30px;
+            width: 470px;
+            padding-left: 0 5px;
+        }
+    }
+     
+    .save-btn {
+        height: 30px;
+        width: 50px;
+        margin-bottom: 80px;
+        background-color: white;
+        border: 2px solid lightgrey;
+        border-radius: 10px;
+    }
+
+    footer {
+        height: 60px;
+        width: 100%;
+        color: rgba(255, 250, 250, 0.664);
+        position: absolute;
+        bottom: 0;
+        text-align: right;
+        border-top: 2px solid rgba(255, 250, 250, 0.664);
+    }
+}
+
+@media screen {
+    @media (max-width: 640px) {
+        body {
+            padding: 0 10px;
+            margin: 0;
+        }
+
+        div {
+            table {
+                margin-bottom: 30px;
+
+                th, td {
+                    padding: 3px;
+                }
+            }
+
+            form {
+                label {
+                    font-size: 0.8em;
+                }
+             
+                .form-text {
+                    height: 20px;
+                    width: 100%;
+                }
+            }
+         
+            .save-btn {
+                height: 20px;
+                margin-bottom: 30px;
+            }
+
+            footer {
+                height: 30px;
+            }
+        }
+    }  
+}
